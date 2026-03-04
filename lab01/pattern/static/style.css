@@ -1,0 +1,221 @@
+body {
+    background: #f5f2eb;
+    color: #1a1a1a;
+    font-family: "Inter", sans-serif;
+    min-height: 100vh;
+}
+h1,
+h2,
+h3 {
+    font-family: "Source Serif 4", serif;
+}
+.mono {
+    font-family: "IBM Plex Mono", monospace;
+}
+.top-stripe {
+    background: #2e5c8a;
+    height: 4px;
+}
+.card {
+    background: #ffffff;
+    border: 1px solid #ddd8ce;
+    border-radius: 6px;
+    padding: 20px;
+}
+.ok-banner {
+    background: #f3f7fb;
+    border: 1px solid #c4d8ea;
+    border-left: 4px solid #2e5c8a;
+    border-radius: 4px;
+    padding: 12px 16px;
+}
+input[type="text"],
+select {
+    background: #fafaf8;
+    border: 1px solid #ccc8be;
+    color: #1a1a1a;
+    border-radius: 4px;
+    padding: 9px 12px;
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.15s;
+}
+input[type="text"]:focus,
+select:focus {
+    border-color: #2e5c8a;
+    box-shadow: 0 0 0 3px rgba(46, 92, 138, 0.08);
+}
+.btn {
+    background: #2e5c8a;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 9px 18px;
+    font-family: "Inter", sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.btn:hover {
+    background: #244d78;
+}
+.task-row {
+    background: #fafaf8;
+    border: 1px solid #e8e4da;
+    border-radius: 4px;
+    padding: 11px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: border-color 0.15s;
+    animation: fadeIn 0.2s ease;
+}
+.task-row:hover {
+    border-color: #ccc8be;
+}
+.task-row.done {
+    opacity: 0.45;
+}
+.task-row.done .task-title {
+    text-decoration: line-through;
+}
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.p-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.p-high {
+    background: #b94040;
+}
+.p-medium {
+    background: #c07830;
+}
+.p-low {
+    background: #4a7c59;
+}
+.cb {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    border: 2px solid #ccc8be;
+    cursor: pointer;
+    background: transparent;
+    flex-shrink: 0;
+    transition: all 0.15s;
+}
+.cb:hover {
+    border-color: #2e5c8a;
+}
+.cb.checked {
+    background: #2e5c8a;
+    border-color: #2e5c8a;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 10 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.5 5l3 3 4-5' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-size: contain;
+}
+.del-btn {
+    background: none;
+    border: none;
+    color: #ccc8be;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 3px 6px;
+    border-radius: 3px;
+    margin-left: auto;
+    transition: all 0.15s;
+    flex-shrink: 0;
+}
+.del-btn:hover {
+    color: #b94040;
+    background: #fdf3f3;
+}
+.tab {
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 4px;
+    transition: all 0.15s;
+}
+.tab.active {
+    background: #f0ece3;
+    color: #1a1a1a;
+    font-weight: 600;
+}
+.log-entry {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    color: #2e5c8a;
+    padding: 3px 0;
+    border-bottom: 1px solid #f0ece3;
+    animation: fadeIn 0.2s ease;
+}
+.counter {
+    font-family: "Source Serif 4", serif;
+    font-size: 40px;
+    font-weight: 600;
+    color: #2e5c8a;
+}
+.section-label {
+    font-family: "Inter", sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #999;
+    margin-bottom: 10px;
+}
+.instance-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #f3f7fb;
+    border: 1px solid #c4d8ea;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 12px;
+    color: #2e5c8a;
+    font-family: "IBM Plex Mono", monospace;
+}
+.pulse-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #4a7c59;
+    animation: pulse 2s infinite;
+}
+@keyframes pulse {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.4;
+    }
+}
+::-webkit-scrollbar {
+    width: 4px;
+}
+::-webkit-scrollbar-track {
+    background: #f0ece3;
+}
+::-webkit-scrollbar-thumb {
+    background: #ccc8be;
+    border-radius: 2px;
+}

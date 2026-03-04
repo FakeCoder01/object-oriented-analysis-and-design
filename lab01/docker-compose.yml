@@ -1,0 +1,46 @@
+version: "3.9"
+
+services:
+  no-pattern:
+    build:
+      context: ./no-pattern
+      dockerfile: Dockerfile
+    container_name: cslab-no-pattern
+    volumes:
+      - db-data:/data
+    restart: unless-stopped
+    networks:
+      - cslab-net
+
+  pattern:
+    build:
+      context: ./pattern
+      dockerfile: Dockerfile
+    container_name: cslab-pattern
+    volumes:
+      - db-data:/data
+    restart: unless-stopped
+    networks:
+      - cslab-net
+
+  nginx:
+    image: nginx:alpine
+    container_name: cslab-nginx
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/cslab.conf:ro,z
+    depends_on:
+      - no-pattern
+      - pattern
+    restart: unless-stopped
+    networks:
+      - cslab-net
+
+networks:
+  cslab-net:
+    driver: bridge
+
+volumes:
+  db-data:
+    driver: local
