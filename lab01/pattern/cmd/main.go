@@ -101,10 +101,7 @@ func getStats(w http.ResponseWriter, r *http.Request) {
 		InstanceID:       instanceID,
 		GetInstanceCalls: callCount,
 		OpenConnections:  openConns,
-		Message: fmt.Sprintf(
-			"GetInstance() был назван %d раз. Задачи: %d",
-			instanceID, callCount, taskCount
-		),
+		Message: fmt.Sprintf("(#%d) GetInstance() был назван %d раз. Задачи: %d", instanceID, callCount, taskCount),
 		Pattern: "singleton",
 	}
 	w.Header().Set("Content-Type", "application/json")
