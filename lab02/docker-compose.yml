@@ -1,0 +1,9 @@
+services:
+  proxy-pattern-lab:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: proxy-pattern-lab
+    ports:
+      - "8080:8080"
+    restart: unless-stopped

@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+        <title>Шаблон проектирования прокси - Лаборатория 2</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;700;800&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            :root {
+                --bg: #0b0e13;
+                --surface: #111620;
+                --border: #1e2636;
+                --muted: #2a3448;
+                --text: #c8d6f0;
+                --dim: #5a6a8a;
+                --accent: #4af2a1; /* proxy green */
+                --warn: #f5c842; /* no-proxy amber */
+                --err: #f25a5a;
+                --info: #5ab4f2;
+                --cache: #b45af2;
+                --font-mono: "JetBrains Mono", monospace;
+                --font-display: "Syne", sans-serif;
+                --radius: 6px;
+            }
+
+            html {
+                scroll-behavior: smooth;
+            }
+
+            body {
+                background: var(--bg);
+                color: var(--text);
+                font-family: var(--font-mono);
+                font-size: 13px;
+                line-height: 1.6;
+                min-height: 100vh;
+                background-image:
+                    radial-gradient(
+                        ellipse 80% 50% at 20% -10%,
+                        #0d2a1e44 0%,
+                        transparent 60%
+                    ),
+                    radial-gradient(
+                        ellipse 60% 40% at 80% 110%,
+                        #1a0d2a33 0%,
+                        transparent 60%
+                    );
+            }
+
+            header {
+                padding: 32px 40px 24px;
+                border-bottom: 1px solid var(--border);
+                display: flex;
+                align-items: flex-start;
+                gap: 24px;
+                flex-wrap: wrap;
+            }
+            .badge {
+                background: var(--accent);
+                color: #000;
+                font-family: var(--font-mono);
+                font-weight: 700;
+                font-size: 10px;
+                letter-spacing: 0.12em;
+                padding: 3px 8px;
+                border-radius: 3px;
+                text-transform: uppercase;
+                align-self: center;
+                white-space: nowrap;
+            }
+            .header-text h1 {
+                font-family: var(--font-display);
+                font-size: clamp(22px, 4vw, 36px);
+                font-weight: 800;
+                letter-spacing: -0.02em;
+                color: #fff;
+                line-height: 1.1;
+            }
+            .header-text p {
+                margin-top: 6px;
+                color: var(--dim);
+                font-size: 12px;
+                max-width: 560px;
+            }
+
+            .controls-section {
+                padding: 20px 40px;
+                border-bottom: 1px solid var(--border);
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+                align-items: center;
+            }
+            .controls-section .section-label {
+                margin: 0;
+                align-self: center;
+                min-width: 80px;
+            }
+
+            btn,
+            button {
+                font-family: var(--font-mono);
+                font-size: 12px;
+                cursor: pointer;
+                border: none;
+                outline: none;
+            }
+            .btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                padding: 7px 14px;
+                border-radius: var(--radius);
+                background: var(--surface);
+                border: 1px solid var(--border);
+                color: var(--text);
+                font-family: var(--font-mono);
+                font-size: 12px;
+                cursor: pointer;
+                transition:
+                    border-color 0.15s,
+                    background 0.15s,
+                    color 0.15s;
+                white-space: nowrap;
+            }
+            .btn:hover {
+                border-color: var(--dim);
+                background: var(--muted);
+            }
+            .btn.active {
+                border-color: var(--accent);
+                color: var(--accent);
+            }
+            .btn-reset {
+                margin-left: auto;
+                background: transparent;
+                border: 1px solid var(--err);
+                color: var(--err);
+                padding: 7px 14px;
+                border-radius: var(--radius);
+                font-family: var(--font-mono);
+                font-size: 12px;
+                cursor: pointer;
+                transition: background 0.15s;
+            }
+            .btn-reset:hover {
+                background: #f25a5a18;
+            }
+
+            .panels {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 0;
+                min-height: calc(100vh - 260px);
+            }
+            @media (max-width: 860px) {
+                .panels {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            .panel {
+                border-right: 1px solid var(--border);
+                display: flex;
+                flex-direction: column;
+            }
+            .panel:last-child {
+                border-right: none;
+            }
+            .panel-header {
+                padding: 16px 24px;
+                border-bottom: 1px solid var(--border);
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            .panel-header .dot {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                flex-shrink: 0;
+            }
+            .panel-title {
+                font-weight: 700;
+                font-size: 13px;
+            }
+            .panel-sub {
+                font-size: 11px;
+                color: var(--dim);
+                margin-top: 1px;
+            }
+
+            /* no proxy */
+            .panel-a .dot {
+                background: var(--warn);
+            }
+            .panel-a .panel-title {
+                color: var(--warn);
+            }
+
+            /* with proxy */
+            .panel-b .dot {
+                background: var(--accent);
+            }
+            .panel-b .panel-title {
+                color: var(--accent);
+            }
+
+            .stats-bar {
+                padding: 10px 24px;
+                border-bottom: 1px solid var(--border);
+                display: flex;
+                gap: 20px;
+                font-size: 11px;
+                color: var(--dim);
+                background: var(--surface);
+            }
+            .stat-item span {
+                color: var(--text);
+                font-weight: 500;
+            }
+            .stat-item.cache-hit span {
+                color: var(--cache);
+            }
+            .stat-item.fast span {
+                color: var(--accent);
+            }
+
+            .log-area {
+                flex: 1;
+                padding: 16px 24px;
+                overflow-y: auto;
+                max-height: 280px;
+                border-bottom: 1px solid var(--border);
+                background: #090c11;
+            }
+            .log-placeholder {
+                color: var(--muted);
+                font-size: 12px;
+                padding: 8px 0;
+            }
+            .log-line {
+                display: flex;
+                gap: 10px;
+                padding: 2px 0;
+                font-size: 11.5px;
+                animation: fadein 0.2s;
+            }
+            @keyframes fadein {
+                from {
+                    opacity: 0;
+                    transform: translateY(3px);
+                }
+                to {
+                    opacity: 1;
+                    transform: none;
+                }
+            }
+            .log-ts {
+                color: var(--muted);
+                flex-shrink: 0;
+            }
+            .log-msg {
+                color: var(--text);
+            }
+            .log-line.db .log-msg {
+                color: var(--warn);
+            }
+            .log-line.info .log-msg {
+                color: var(--info);
+            }
+            .log-line.cache .log-msg {
+                color: var(--cache);
+            }
+            .log-line.warn .log-msg {
+                color: #f2a25a;
+            }
+
+            .results-area {
+                padding: 16px 24px;
+                overflow-y: auto;
+                max-height: 240px;
+            }
+            .results-placeholder {
+                color: var(--muted);
+                font-size: 12px;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            th {
+                text-align: left;
+                font-size: 10px;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+                color: var(--dim);
+                padding: 4px 8px;
+                border-bottom: 1px solid var(--border);
+            }
+            td {
+                padding: 6px 8px;
+                font-size: 12px;
+                border-bottom: 1px solid var(--border);
+                vertical-align: middle;
+            }
+            tr:last-child td {
+                border-bottom: none;
+            }
+            tr:hover td {
+                background: var(--surface);
+            }
+            .rating {
+                color: var(--accent);
+            }
+            .genre-pill {
+                background: var(--muted);
+                border-radius: 3px;
+                padding: 1px 6px;
+                font-size: 10px;
+                color: var(--dim);
+            }
+
+            .spinner {
+                display: inline-block;
+                width: 10px;
+                height: 10px;
+                border: 2px solid var(--muted);
+                border-top-color: var(--accent);
+                border-radius: 50%;
+                animation: spin 0.6s linear infinite;
+                vertical-align: middle;
+            }
+            @keyframes spin {
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <span class="badge">Лаборатория OOAП</span>
+            <div class="header-text">
+                <h1>Шаблон проектирования прокси</h1>
+            </div>
+        </header>
+
+        <div class="controls-section">
+            <span class="section-label">// запрос</span>
+            <button class="btn active" onclick="setQuery('all')">
+                Все книги
+            </button>
+            <button class="btn" onclick="setQuery('id')">По ID</button>
+            <button class="btn" onclick="setQuery('genre')">По жанрам</button>
+            <span id="sub-all"></span>
+            <span id="sub-id" style="display: none">
+                &nbsp; ID:&nbsp;
+                <select
+                    id="book-id"
+                    onchange="runBoth()"
+                    style="
+                        background: var(--surface);
+                        color: var(--text);
+                        border: 1px solid var(--border);
+                        border-radius: 4px;
+                        padding: 5px 8px;
+                        font-family: var(--font-mono);
+                        font-size: 12px;
+                    "
+                >
+                    <option value="1">1 - Clean Code</option>
+                    <option value="2">2 - Design Patterns</option>
+                    <option value="3">3 - Pragmatic Programmer</option>
+                    <option value="4">4 - Dune</option>
+                    <option value="5">5 - Foundation</option>
+                    <option value="6">6 - Neuromancer</option>
+                    <option value="7">7 - 1984</option>
+                    <option value="8">8 - Brave New World</option>
+                </select>
+            </span>
+            <span id="sub-genre" style="display: none">
+                &nbsp; Жанр:&nbsp;
+                <select
+                    id="book-genre"
+                    onchange="runBoth()"
+                    style="
+                        background: var(--surface);
+                        color: var(--text);
+                        border: 1px solid var(--border);
+                        border-radius: 4px;
+                        padding: 5px 8px;
+                        font-family: var(--font-mono);
+                        font-size: 12px;
+                    "
+                >
+                    <option>Программирование</option>
+                    <option>Научная фантастика</option>
+                    <option>Дистопия</option>
+                </select>
+            </span>
+            <button class="btn-reset" onclick="resetAll()">
+                ↺ Сброс кэша и &amp; журналов
+            </button>
+        </div>
+
+        <div class="panels">
+            <!-- w/o Proxy -->
+            <div class="panel panel-a">
+                <div class="panel-header">
+                    <div class="dot"></div>
+                    <div>
+                        <div class="panel-title">Без прокси</div>
+                        <div class="panel-sub">
+                            Клиент → RealBookService (прямой)
+                        </div>
+                    </div>
+                </div>
+                <div class="stats-bar" id="stats-a">
+                    <span class="stat-item"
+                        >истек: <span id="el-a">—</span> мс</span
+                    >
+                    <span class="stat-item">из кэша: <span>НЕТ</span></span>
+                    <span class="stat-item"
+                        >звонки были сделаны: <span id="calls-a">0</span></span
+                    >
+                </div>
+                <div class="log-area" id="log-a">
+                    <div class="log-placeholder">// ожидание запроса…</div>
+                </div>
+                <div class="results-area" id="results-a">
+                    <div class="results-placeholder">
+                        // Результаты отображаются здесь.
+                    </div>
+                </div>
+            </div>
+
+            <!-- w/ Proxy -->
+            <div class="panel panel-b">
+                <div class="panel-header">
+                    <div class="dot"></div>
+                    <div>
+                        <div class="panel-title">С помощью прокси</div>
+                        <div class="panel-sub">
+                            Клиент → BookServiceProxy → RealBookService
+                        </div>
+                    </div>
+                </div>
+                <div class="stats-bar" id="stats-b">
+                    <span class="stat-item"
+                        >истек: <span id="el-b">—</span> мс</span
+                    >
+                    <span class="stat-item" id="cache-label-b"
+                        >из кэша: <span id="cache-b">НЕТ</span></span
+                    >
+                    <span class="stat-item"
+                        >звонки были сделаны: <span id="calls-b">0</span></span
+                    >
+                </div>
+                <div class="log-area" id="log-b">
+                    <div class="log-placeholder">// ожидание запроса…</div>
+                </div>
+                <div class="results-area" id="results-b">
+                    <div class="results-placeholder">
+                        // Результаты отображаются здесь.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            let currentQuery = "all";
+            let callsA = 0,
+                callsB = 0;
+
+            function setQuery(q) {
+                currentQuery = q;
+                document
+                    .querySelectorAll(".btn")
+                    .forEach((b) => b.classList.remove("active"));
+                event.target.classList.add("active");
+                document.getElementById("sub-all").innerHTML = "";
+                document.getElementById("sub-id").style.display =
+                    q === "id" ? "" : "none";
+                document.getElementById("sub-genre").style.display =
+                    q === "genre" ? "" : "none";
+                runBoth();
+            }
+
+            function buildUrl(base) {
+                if (currentQuery === "all") return `${base}/books`;
+                if (currentQuery === "id")
+                    return `${base}/books/${document.getElementById("book-id").value}`;
+                if (currentQuery === "genre")
+                    return `${base}/books/genre/${document.getElementById("book-genre").value}`;
+            }
+
+            async function fetchPanel(
+                panelId,
+                urlBase,
+                elId,
+                callsId,
+                cacheLabelId,
+                cacheId,
+            ) {
+                const logEl = document.getElementById("log-" + panelId);
+                const resEl = document.getElementById("results-" + panelId);
+                logEl.innerHTML =
+                    '<div class="log-line"><span class="log-ts">…</span><span class="log-msg"><span class="spinner"></span> запрос…</span></div>';
+
+                const t0 = performance.now();
+                const res = await fetch(buildUrl(urlBase));
+                const data = await res.json();
+                const clientMs = Math.round(performance.now() - t0);
+
+                // logs
+                logEl.innerHTML = data.logs
+                    .map(
+                        (l) =>
+                            `<div class="log-line ${l.type}">
+        <span class="log-ts">${l.timestamp}</span>
+        <span class="log-msg">${escHtml(l.message)}</span>
+      </div>`,
+                    )
+                    .join("");
+                logEl.scrollTop = logEl.scrollHeight;
+
+                // elapsed
+                document.getElementById(elId).textContent = data.fromCache
+                    ? "< 1"
+                    : data.elapsedMs;
+
+                // cache indicator
+                if (cacheId) {
+                    const hit = data.fromCache;
+                    document.getElementById(cacheId).textContent = hit
+                        ? "ДА"
+                        : "НЕТ";
+                    document.getElementById(cacheLabelId).className =
+                        "stat-item" + (hit ? " cache-hit" : "");
+                }
+
+                // calls counter
+                const cEl = document.getElementById(callsId);
+                cEl.textContent = parseInt(cEl.textContent || "0") + 1;
+
+                // results table
+                if (!data.books || data.books.length === 0) {
+                    resEl.innerHTML =
+                        '<div class="results-placeholder">// no results</div>';
+                    return;
+                }
+                resEl.innerHTML = `<table>
+      <thead><tr>
+      <th>#</th>
+      <th>Заголовок</th>
+      <th>Автор</th>
+      <th>Жанр</th>
+      <th>Год</th>
+      <th>★</th
+      ></tr></thead>
+      <tbody>${data.books
+          .map(
+              (b) => `
+        <tr>
+          <td>${b.id}</td>
+          <td>${escHtml(b.title)}</td>
+          <td>${escHtml(b.author)}</td>
+          <td><span class="genre-pill">${escHtml(b.genre)}</span></td>
+          <td>${b.year}</td>
+          <td class="rating">${b.rating}</td>
+        </tr>`,
+          )
+          .join("")}
+      </tbody>
+    </table>`;
+            }
+
+            function runBoth() {
+                fetchPanel("a", "/api/no-proxy", "el-a", "calls-a", null, null);
+                fetchPanel(
+                    "b",
+                    "/api/with-proxy",
+                    "el-b",
+                    "calls-b",
+                    "cache-label-b",
+                    "cache-b",
+                );
+            }
+
+            async function resetAll() {
+                await fetch("/api/no-proxy/reset", { method: "POST" });
+                await fetch("/api/with-proxy/reset", { method: "POST" });
+                ["a", "b"].forEach((p) => {
+                    document.getElementById("log-" + p).innerHTML =
+                        '<div class="log-placeholder">// сброс - ожидание запроса…</div>';
+                    document.getElementById("results-" + p).innerHTML =
+                        '<div class="results-placeholder">// Результаты отображаются здесь.</div>';
+                    document.getElementById("el-" + p).textContent = "—";
+                    document.getElementById("calls-" + p).textContent = "0";
+                });
+                if (document.getElementById("cache-b")) {
+                    document.getElementById("cache-b").textContent = "НЕТ";
+                    document.getElementById("cache-label-b").className =
+                        "stat-item";
+                }
+                callsA = 0;
+                callsB = 0;
+            }
+
+            function escHtml(s) {
+                return String(s)
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;");
+            }
+
+            // Auto-run on load
+            runBoth();
+        </script>
+    </body>
+</html>
