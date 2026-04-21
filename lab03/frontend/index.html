@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Лаб 3 : Редактор геометрических объектов</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body class="bg-gray-100 text-gray-800 font-sans p-6">
+        <div class="max-w-6xl mx-auto bg-white shadow-md rounded-lg p-6">
+            <h1 class="text-2xl font-bold mb-6 border-b pb-2">
+                Редактор геометрических объектов (Лаб 3)
+            </h1>
+
+            <div class="flex gap-4 mb-6">
+                <div class="flex flex-col gap-2">
+                    <label class="font-semibold text-sm">Режим</label>
+                    <select id="modeSelect" class="border p-2 rounded">
+                        <option value="nopattern">Без Паттерн</option>
+                        <option value="memento">Memento Паттерн</option>
+                    </select>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <label class="font-semibold text-sm">Форма</label>
+                    <select id="shapeType" class="border p-2 rounded">
+                        <option value="circle">Круг</option>
+                        <option value="rectangle">Прямоугольник</option>
+                    </select>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <label class="font-semibold text-sm">Цвет</label>
+                    <input
+                        type="color"
+                        id="shapeColor"
+                        value="#3b82f6"
+                        class="border p-1 rounded h-10 w-16"
+                    />
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <label class="font-semibold text-sm">Размер</label>
+                    <input
+                        type="range"
+                        id="shapeSize"
+                        min="20"
+                        max="150"
+                        value="50"
+                        class="mt-2"
+                    />
+                </div>
+            </div>
+
+            <div class="flex gap-4 mb-4">
+                <button
+                    id="undoBtn"
+                    class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded font-semibold transition"
+                >
+                    Отменить
+                </button>
+                <button
+                    id="redoBtn"
+                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded font-semibold transition"
+                >
+                    Повтор
+                </button>
+                <button
+                    id="clearBtn"
+                    class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded font-semibold transition ml-auto"
+                >
+                    Очистить холст
+                </button>
+            </div>
+
+            <div class="text-sm text-gray-500 mb-2">
+                Щелкните по холсту, чтобы разместить фигуру. Текущий режим:
+                <span id="currentModeLabel" class="font-bold text-gray-700">
+                    Без Паттерна
+                </span>
+            </div>
+            <div id="canvas" class="canvas-area"></div>
+        </div>
+
+        <script src="script.js"></script>
+    </body>
+</html>
