@@ -1,0 +1,16 @@
+FROM eclipse-temurin:17-jdk
+
+RUN apt-get update && apt-get install -y \
+    libxext6 \
+    libxrender1 \
+    libxtst6 \
+    libxi6 \
+    libx11-6
+
+WORKDIR /app
+
+COPY Client.java /app/
+
+RUN javac Client.java
+
+CMD ["java", "Client"]

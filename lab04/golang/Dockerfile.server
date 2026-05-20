@@ -1,0 +1,7 @@
+FROM gcc:latest
+RUN apt-get update && apt-get install -y git
+WORKDIR /app
+RUN git clone https://github.com/fakecoder01/meowdb.git .
+RUN make
+EXPOSE 6969
+CMD ["./Meow", "6969"]
